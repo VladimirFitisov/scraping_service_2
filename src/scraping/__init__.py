@@ -1,1 +1,1 @@
-default_app_config = 'scraping.apps.ScrapingConfig'
+default_app_config = 'scraping.apps.ScrapingConfig'#для переопределения в админке русского языка
