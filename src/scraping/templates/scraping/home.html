@@ -7,14 +7,18 @@
         <div class="card my-3">
             <h5 class="card-header"><a href="{{ obj.url }}">{{ obj.title }}</a></h5>
             <div class="card-body">
+                <h4>{{ obj.company }}</h4>
                 <p class="card-text">{{ obj.description }}</p>
                 <p>{{obj.city.name}} | {{obj.language.name}}</p>
-                <p>{{obj.timestamp|date:" d-m-Y" }}</p>
+                <p>{{obj.timestamp|date:" d-m-Y"}}</p>
             </div>
         </div>
+    {% empty %}
+          <h3>К сожелению, по вашему запросу ничего не найдено.</h3>
     {% endfor %}
+
     <div class="row">
-        <div class="col-md-auto">
+        <div class="col-md-2 mx-auto">
         <form method="GET" action="">
         <div class="form-group">
         {{ form.as_p }}
