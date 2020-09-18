@@ -3,7 +3,7 @@
 {% block title %} Home {% endblock %}
 
 {% block content %}
-    {% for obj in objects_list %}
+    {% for obj in object_list %}
         <div class="card my-3">
             <h5 class="card-header"><a href="{{ obj.url }}">{{ obj.title }}</a></h5>
             <div class="card-body">
@@ -13,11 +13,17 @@
             </div>
         </div>
     {% endfor %}
+    <div class="row">
+        <div class="col-md-auto">
+        <form method="GET" action="">
+        <div class="form-group">
+        {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary">Найти</button>
+        </form>
+        </div>
+    </div>
 
-<form method="GET" action="">
-    {{ form.as_p }}
-    <input type="submit" value="Submit">
-</form>
 
 {% endblock %}
 
