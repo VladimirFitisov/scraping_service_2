@@ -37,10 +37,8 @@ def work(url):
 
 
 def rabota(url):
-<<<<<<< HEAD
     domain = 'https://rabota.ua'
     resp = requests.get(url, headers=headers)
-=======
     jobs = []
     errors = []
     domain = 'https://rabota.ua'
@@ -77,13 +75,11 @@ def dou(url):
     # domain = 'https://jobs.dou.ua/'
     # url = 'https://jobs.dou.ua/vacancies/?category=Python'
     resp = requests.get(url, headers=headers)
->>>>>>> c932f4d... Add new function Dou.ua end Djinni.ua
     jobs = []
     errors = []
 
     if resp.status_code == 200:
         soup = BS(resp.content, 'html.parser')
-<<<<<<< HEAD
         table = soup.find('table', id='ctl00_content_vacancyList_gridList')
         if table:
             tr_list = table.find_all('div', attrs={'id': True})
@@ -97,10 +93,10 @@ def dou(url):
                     p = div.find('div', attrs={'class': 'company-name'})
                     if p:
                         company = p.a.text
-                    jobs.append({'title': title.text, 'url': domain + href, 'description': content, 'company': company})
+                    jobs.append({'title': title.text, 'url': href, 'description': content, 'company': company})
                 else:
                     errors.append({'url': url, 'title': "Table does not exists"})
-=======
+
         main_div = soup.find('div', id='vacancyListId')
         if main_div:
             li_list = main_div.find_all('li', attrs={'class': 'l-vacancy'})
@@ -119,17 +115,11 @@ def dou(url):
                 jobs.append({'title': title.text, 'url': href, 'description': content, 'company': company, 'city': city})
             else:
                 errors.append({'url': url, 'title': "Div does not exists"})
->>>>>>> c932f4d... Add new function Dou.ua end Djinni.ua
     else:
         errors.append({'url': url, 'title': "Page do noot response"})
     return jobs, errors
 
-<<<<<<< HEAD
 
-if __name__ == '__main__':
-    url = 'https://rabota.ua/zapros/python/%d1%83%d0%ba%d1%80%d0%b0%d0%b8%d0%bd%d0%b0'
-    jobs, errors = rabota(url)
-=======
 def djinni(url):
     domain = 'https://djinni.co'
     # url = 'https://djinni.co/jobs/keyword-python/'
@@ -166,7 +156,6 @@ def djinni(url):
 if __name__ == '__main__':
     url = 'https://djinni.co/jobs/keyword-python/'
     jobs, errors = djinni(url)
->>>>>>> c932f4d... Add new function Dou.ua end Djinni.ua
     h = codecs.open('work.txt', 'w', 'utf-8')
     h.write(str(jobs))
     h.close()
