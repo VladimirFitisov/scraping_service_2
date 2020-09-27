@@ -6,9 +6,9 @@ from random import randint
 
 headers = [{'User-Agent': 'Mozilla/5.0(Windows NT 5.1: rv:47.0) Gecko/20100101 Firefox/47.0',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'},
-           {'User-Agent': 'Opera/9.80 (S60; SymbOS; Opera Mobi/499; U; es-ES) Presto/2.4.18 Version/10.00'},
-           {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:40.0) Gecko/20100101 Firefox/40.0'}
-           ]
+           {'User-Agent': 'Mozilla / 5.0 (Windows NT 10.0; Win64; x64) AppleWebKit / 537.36 (KHTML, как Gecko) Chrome / 80.0.3987.163 Safari / 537.36 OPR / 67.0.3575.137'},
+           {'User-Agent': 'Mozilla / 5.0 (Windows NT 10.0; Win64; x64) AppleWebKit / 537.36 (KHTML, как Gecko) Chrome / 81.0.4044.92 Safari / 537.36 — на Windows 10'}
+        ]
 
 __all__ = ('work', 'rabota', 'dou', 'djinni')
 
