@@ -25,7 +25,7 @@ parsers = (
     (dou, 'dou'),
     (djinni, 'djinni')
 )
-
+jobs, errors = [], []
 # настройки user по умолчанию из админки
 def get_settings():
     qs = User.objects.filter(send_email=True).values()
@@ -47,6 +47,12 @@ def get_urls(_settings):
         urls.append(tmp)
     return urls
 
+async def main(value):
+    func, url, city, language = value
+    job, err = await loop.run_in_executor(None, func, url, city, language)
+    errors.extend(err)
+    jobs.extend(job)
+
 # Вызовы функции столько количества раз сколько у нас есть уникальных наборов города и языка
 settings = get_settings()
 url_list = get_urls(settings)
@@ -55,22 +61,24 @@ url_list = get_urls(settings)
 # language = Language.objects.filter(slug='python').first()
 
 import time
-jobs, errors = [], []
 start = time.time()
 
 loop = asyncio.get_event_loop()
-tmp_tasks = [(func, data.get(key),data['city'], data['language'])
+tmp_tasks = [(func, data['url_data'][key],data['city'], data['language'])
              for data in url_list
              for func, key in parsers
              ]
 tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks])
 # Запуск функции скрапинга с наборами url для всех которые существуют
-for data in url_list:
-    for func, key in parsers:
-        url = data['url_data'][key]
-        j, e = func(url, city=data['city'], language=data['language'])
-        jobs += j
-        errors += e
+# for data in url_list:
+#     for func, key in parsers:
+#         url = data['url_data'][key]
+#         j, e = func(url, city=data['city'], language=data['language'])
+#         jobs += j
+#         errors += e
+
+loop.run_until_complete(tasks)
+loop.close()
 print(time.time()-start)
 
 
