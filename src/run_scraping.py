@@ -1,49 +1,88 @@
+import asyncio
 import codecs
 import os, sys
+
+from django.contrib.auth import get_user_model
+from django.db import DatabaseError
 
 proj = os.path.dirname(os.path.abspath('manage.py'))
 sys.path.append(proj)
 os.environ["DJANGO_SETTINGS_MODULE"] = "scraping_service.settings"
 
 import django
+
 django.setup()
 
 from scraping.parsers import *
+from scraping.models import Vacancy, City, Language, Error, Url
 
-from scraping.models import Vacancy, City, Language
+User = get_user_model()  # Возвращает пользователя поумолчанию  который определен в настройка проекта (в админке)
 
-
-from django.db import DatabaseError
-
-
-
-
-
-
+# получение url по клчам из словаря
 parsers = (
-    (work, 'https://www.work.ua/jobs-kyiv-python/'),
-    (rabota, 'https://rabota.ua/zapros/python/%d0%ba%d0%b8%d0%b5%d0%b2'),
-    (dou, 'https://jobs.dou.ua/vacancies/?city=%D0%9A%D0%B8%D0%B5%D0%B2&category=Python'),
-    (djinni, 'https://djinni.co/jobs/keyword-python/kyiv/'),
+    (work, 'work'),
+    (rabota, 'rabota'),
+    (dou, 'dou'),
+    (djinni, 'djinni')
 )
 
-city = City.objects.filter(slug='kiev')
-language = Language.objects.filter(slug='python')
+# настройки user по умолчанию из админки
+def get_settings():
+    qs = User.objects.filter(send_email=True).values()
+    settings_lst = set((q['city_id'], q['language_id']) for q in qs)  # генератор множества, будут находится настройки по умолчанию для нашего набора
+    return settings_lst
 
+
+
+# создание списка с набором url в настройках пар language-city
+def get_urls(_settings):
+    qs = Url.objects.all().values()
+    url_dict = {(q['city_id'], q['language_id']): q['url_data'] for q in qs}
+    urls = []
+    for pair in _settings:
+        tmp = {}
+        tmp['city'] = pair[0]
+        tmp['language'] = pair[1]
+        tmp['url_data'] = url_dict[pair]
+        urls.append(tmp)
+    return urls
+
+# Вызовы функции столько количества раз сколько у нас есть уникальных наборов города и языка
+settings = get_settings()
+url_list = get_urls(settings)
+
+# city = City.objects.filter(slug='kiev').first()
+# language = Language.objects.filter(slug='python').first()
+
+import time
 jobs, errors = [], []
+start = time.time()
 
-for func, url in parsers:
-    j, e = func(url)
-    jobs += j
-    errors += e
+loop = asyncio.get_event_loop()
+tmp_tasks = [(func, data.get(key),data['city'], data['language'])
+             for data in url_list
+             for func, key in parsers
+             ]
+tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks])
+# Запуск функции скрапинга с наборами url для всех которые существуют
+for data in url_list:
+    for func, key in parsers:
+        url = data['url_data'][key]
+        j, e = func(url, city=data['city'], language=data['language'])
+        jobs += j
+        errors += e
+print(time.time()-start)
+
 
 for job in jobs:
-    v = Vacancy(**job, city=city, language=Language)
+    v = Vacancy(**job)
     try:
         v.save()
     except DatabaseError:
         pass
+if errors:
+    er = Error(data=errors).save()
 
-h = codecs.open('work.txt', 'w', 'utf-8')
-h.write(str(jobs))
-h.close()
+# h = codecs.open('work.txt', 'w', 'utf-8')
+# h.write(str(jobs))
+# h.close()
