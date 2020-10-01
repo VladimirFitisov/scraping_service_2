@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %} Home {% endblock %}
+
+{% block content %}
+    {% for obj in object_list %}
+        <div class="card my-3">
+            <h5 class="card-header"><a href="{{ obj.url }}">{{ obj.title }}</a></h5>
+            <div class="card-body">
+                <h4>{{ obj.company }}</h4>
+                <p class="card-text">{{ obj.description }}</p>
+                <p>{{obj.city.name}} | {{obj.language.name}}</p>
+                <p>{{obj.timestamp|date:" d-m-Y"}}</p>
+            </div>
+        </div>
+    {% empty %}
+          <h3>К сожелению, по вашему запросу ничего не найдено.</h3>
+    {% endfor %}
+
+    {% if object_list %}
+{#    блок для вывода погинация#}
+        <div class="rol">
+            <div class="col">
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if object_list.has_previous %}
+                            <a href="?page=1">&laquo; first</a>
+                            <a href="?page={{ object_list.previous_page_number }}">previous</a>
+                        {% endif %}
+
+                        <span class="current">
+                            Page {{ object_list.number }} of {{ object_list.paginator.num_pages }}.
+                        </span>
+
+                        {% if object_list.has_next %}
+                            <a href="?page={{ object_list.next_page_number }}">next</a>
+                            <a href="?page={{ object_list.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+     {% endif %}
+    <div class="row">
+        <div class="col-md-2 mx-auto">
+        <form method="GET" action="{% url 'list' %}">
+        <div class="form-group">
+        {{ form.as_p }}
+        </div>
+        <button type="submit" class="btn btn-primary">Найти</button>
+        </form>
+        </div>
+    </div>
+
+
+{% endblock %}
+

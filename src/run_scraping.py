@@ -18,7 +18,7 @@ from scraping.models import Vacancy, City, Language, Error, Url
 
 User = get_user_model()  # Возвращает пользователя поумолчанию  который определен в настройка проекта (в админке)
 
-# получение url по клчам из словаря
+# получение url по ключам из словаря
 parsers = (
     (work, 'work'),
     (rabota, 'rabota'),
@@ -26,12 +26,13 @@ parsers = (
     (djinni, 'djinni')
 )
 jobs, errors = [], []
+
+
 # настройки user по умолчанию из админки
 def get_settings():
     qs = User.objects.filter(send_email=True).values()
     settings_lst = set((q['city_id'], q['language_id']) for q in qs)  # генератор множества, будут находится настройки по умолчанию для нашего набора
     return settings_lst
-
 
 
 # создание списка с набором url в настройках пар language-city
@@ -46,6 +47,7 @@ def get_urls(_settings):
         tmp['url_data'] = url_dict[pair]
         urls.append(tmp)
     return urls
+
 
 async def main(value):
     func, url, city, language = value
@@ -62,7 +64,6 @@ url_list = get_urls(settings)
 
 import time
 start = time.time()
-
 loop = asyncio.get_event_loop()
 tmp_tasks = [(func, data['url_data'][key],data['city'], data['language'])
              for data in url_list
@@ -79,9 +80,8 @@ tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks])
 
 loop.run_until_complete(tasks)
 loop.close()
+
 print(time.time()-start)
-
-
 for job in jobs:
     v = Vacancy(**job)
     try:
@@ -91,6 +91,4 @@ for job in jobs:
 if errors:
     er = Error(data=errors).save()
 
-# h = codecs.open('work.txt', 'w', 'utf-8')
-# h.write(str(jobs))
-# h.close()
+
