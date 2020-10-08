@@ -5,11 +5,11 @@ https://docs.djangoproject.com/en/3.1/topics/auth/default/
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 
-from accounts.forms import UsersLoginForm
+from accounts.forms import UserLoginForm
 
 #функция входа
 def login_view(request):
-    form = UsersLoginForm(request.POST or None)
+    form = UserLoginForm(request.POST or None)
     if form.is_valid():
         #получение данных из формы
         data = form.cleaned_data
