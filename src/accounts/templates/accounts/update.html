@@ -7,10 +7,13 @@
         <div class="col-md-6 mx-auto">
             <h5 class="my-2">Настройки</h5>
         <form method="POST" action="">{% csrf_token %}
-        <div class="form-group">
-        {{ form.as_p }}
-        </div>
-        <button type="submit" class="btn btn-primary">Сохранить</button>
+            <div class="form-group">
+            {{ form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
+        </form>
+        <form method="POST" action="{% url 'accounts:delete' %}">{% csrf_token %}
+            <button type="submit" class="btn btn-danger my-3">Удалить</button>
         </form>
         </div>
     </div>
