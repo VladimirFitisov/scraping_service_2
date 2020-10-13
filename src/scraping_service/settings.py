@@ -16,13 +16,20 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+SECRET_KEY = os.getenv('PASS_WORD')
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+
+
 # OR, the same with increased verbosity
-load_dotenv(verbose=True)
+# load_dotenv(verbose=True)
 
 # OR, explicitly providing path to '.env'
-from pathlib import Path  # Python 3.6+ only
-env_path = Path('.') / '.env'
-load_dotenv(dotenv_path=env_path)
+# from pathlib import Path  # Python 3.6+ only
+# env_path = Path('.') / '.env'
+# load_dotenv(dotenv_path=env_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -32,7 +39,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('PASS_WORD')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True #включение режима дебага
@@ -134,3 +140,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 AUTH_USER_MODEL = 'accounts.MyUser'
+
+# отправка писем см. https://data-flair.training/blogs/django-send-email/
+EMAIL_BACKEND ='django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = EMAIL_HOST
+EMAIL_USE_TLS = True
+EMAIL_PORT = EMAIL_PORT
+EMAIL_HOST_USER = EMAIL_HOST_USER
+EMAIL_HOST_PASSWORD = EMAIL_HOST_PASSWORD
