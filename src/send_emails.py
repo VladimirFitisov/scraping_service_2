@@ -18,7 +18,7 @@ sys.path.append(proj)
 os.environ["DJANGO_SETTINGS_MODULE"] = "scraping_service.settings"
 
 django.setup()
-from scraping.models import Vacancy, Error
+from scraping.models import Vacancy, Error, Url
 
 today = datetime.date.today()
 subject = f"Рассылка вакансий {today}"
@@ -58,15 +58,29 @@ if users_dict:
             msg.send()
 #Отправка письма с ошибками на почту админа
 qs = Error.objects.filter(timestamp=today)
+subject = ''
+text_content = ''
+to = ADMIN_USER
+_html = ''
 if qs.exists():
     error = qs.first()
     data = error.data
-    _html = ''
     for i in data:
         _html += f'<p><a href="{i["url"]}">Error: {i["title"]}</a></p>'
     subject = f"Ошибки скрапинга {today}"
     text_content = "Ошибки скрапинга"
-    to = ADMIN_USER
+
+qs = Url.objects.all().values('city', 'language')
+urls_dict = {(i['city'], i['language']): True for i in qs}
+urls_err = ''
+for keys in users_dict.keys():
+    if keys not in urls_dict:
+        urls_err += f'<p> Для города: {keys[0]} и ЯП {keys[1]} отсутствуют урлы</p><br>'
+if urls_err:
+    subject += 'Отсутсвующие urls'
+    _html += urls_err
+
+if subject:
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(_html, "text/html")
     msg.send()

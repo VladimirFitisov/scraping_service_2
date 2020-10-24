@@ -1,6 +1,7 @@
 import asyncio
 import codecs
 import os, sys
+import datetime as dt
 
 from django.contrib.auth import get_user_model
 from django.db import DatabaseError
@@ -31,7 +32,8 @@ jobs, errors = [], []
 # настройки user по умолчанию из админки
 def get_settings():
     qs = User.objects.filter(send_email=True).values()
-    settings_lst = set((q['city_id'], q['language_id']) for q in qs)  # генератор множества, будут находится настройки по умолчанию для нашего набора
+    settings_lst = set((q['city_id'], q['language_id']) for q in
+                       qs)  # генератор множества, будут находится настройки по умолчанию для нашего набора
     return settings_lst
 
 
@@ -41,11 +43,12 @@ def get_urls(_settings):
     url_dict = {(q['city_id'], q['language_id']): q['url_data'] for q in qs}
     urls = []
     for pair in _settings:
-        tmp = {}
-        tmp['city'] = pair[0]
-        tmp['language'] = pair[1]
-        tmp['url_data'] = url_dict[pair]
-        urls.append(tmp)
+        if pair in url_dict:#обработка доступных значений город-язык программирования
+            tmp = {}
+            tmp['city'] = pair[0]
+            tmp['language'] = pair[1]
+            tmp['url_data'] = url_dict[pair]
+            urls.append(tmp)
     return urls
 
 
@@ -55,6 +58,7 @@ async def main(value):
     errors.extend(err)
     jobs.extend(job)
 
+
 # Вызовы функции столько количества раз сколько у нас есть уникальных наборов города и языка
 settings = get_settings()
 url_list = get_urls(settings)
@@ -63,9 +67,10 @@ url_list = get_urls(settings)
 # language = Language.objects.filter(slug='python').first()
 
 import time
+
 start = time.time()
 loop = asyncio.get_event_loop()
-tmp_tasks = [(func, data['url_data'][key],data['city'], data['language'])
+tmp_tasks = [(func, data['url_data'][key], data['city'], data['language'])
              for data in url_list
              for func, key in parsers
              ]
@@ -81,7 +86,7 @@ tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks])
 loop.run_until_complete(tasks)
 loop.close()
 
-print(time.time()-start)
+print(time.time() - start)
 for job in jobs:
     v = Vacancy(**job)
     try:
@@ -89,6 +94,12 @@ for job in jobs:
     except DatabaseError:
         pass
 if errors:
-    er = Error(data=errors).save()
-
-
+    qs = Error.objects.filter(timestamp=dt.date.today())
+    if qs.exist():
+        err = qs.first()
+        data = err.data
+        data.update({'errors': errors})
+        err.data.update({'errors': errors})
+        err.save()
+    else:
+        er = Error(data=f'errors: {errors}').save()
