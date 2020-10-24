@@ -63,6 +63,8 @@ class Error(models.Model):
     timestamp = models.DateField(auto_now_add=True)
     data = jsonfield.JSONField()
 
+    def __str__(self):
+        return str(self.timestamp)
 
 # Хранение адресов пар язык программирования - город
 class Url(models.Model):
