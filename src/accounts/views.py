@@ -7,7 +7,10 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 
 from django.contrib import messages  # для вывода сообщений https://docs.djangoproject.com/en/3.1/ref/contrib/messages/
 
-from accounts.forms import UserLoginForm, UserRegistrationform, UserUpdateForm
+from accounts.forms import UserLoginForm, UserRegistrationform, UserUpdateForm, ContactForm
+from scraping.models import Error
+
+import datetime as dt
 
 User = get_user_model()
 
@@ -47,8 +50,9 @@ def register_view(request):
     return render(request, 'accounts/register.html', {'form': form})
 
 
-# форма, которая позволяет проверить какие у него настройки
+# форма кабинета пользователя, которая позволяет проверить какие у него настройки
 def update_view(request):
+    contact_form = ContactForm()
     if request.user.is_authenticated:
         user = request.user
         if request.method == 'POST':
@@ -65,7 +69,7 @@ def update_view(request):
         form = UserUpdateForm(
             initial={'city': user.city, 'language': user.language, 'send_email': user.send_email}
         )
-        return render(request, 'accounts/update.html', {'form': form})
+        return render(request, 'accounts/update.html', {'form': form, 'contact_form': contact_form})
     else:
         return redirect('accounts:login')
 
@@ -79,3 +83,30 @@ def delete_view(request):
             qs.delete()
             messages.error(request, 'Пользователь удален :(')
     return redirect('home')
+
+
+# функция добавления сообщения от пользователей
+def contact(request):
+    if request.method == 'POST':
+        contact_form = ContactForm(request.POST or None)
+        if contact_form.is_valid():
+            data = contact_form.cleaned_data
+            city = data.get('city')
+            language = data.get('language')
+            email = data.get('email')
+            qs = Error.objects.filter(timestamp=dt.date.today())  # получение записи из бд, есть ли ошибки
+            if qs.exist():
+                err = qs.first()
+                data = err.data.get('user_data', [])
+                data.append({'city': city, 'language': language, 'email': email})
+                err.data['user_data'] = data
+                err.save()
+            else:
+                data = [{'city': city, 'language': language, 'email': email}]
+                Error(data=f"user_data: {data}").save()
+            messages.success(request, 'Данные отправлены администрации')
+            return redirect('accounts:update')
+        else:
+            return redirect('accounts:update')
+    else:
+        return redirect('accounts:login')

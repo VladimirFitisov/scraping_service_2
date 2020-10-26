@@ -8,6 +8,7 @@ from django.contrib.auth.hashers import check_password
 
 from scraping.models import City, Language
 
+
 User = get_user_model()  # получение usera из базы данных
 
 
@@ -69,3 +70,16 @@ class UserUpdateForm(forms.Form):
     class Meta():
         model = User  # создаем форму на основе модели User
         fields = ('email', 'language', 'send_email')
+
+
+class ContactForm(forms.Form):
+    city = forms.CharField(
+        required=True, widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Город'
+    )
+    language = forms.CharField(
+        required=True, widget=forms.TextInput(attrs={'class': 'form-control'}),
+        label='Cпециальность'
+    )
+    email = forms.EmailField(
+        label='Введите email', widget=forms.EmailInput(attrs={'class': 'form-control'}))
