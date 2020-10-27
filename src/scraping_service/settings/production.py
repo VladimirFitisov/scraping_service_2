@@ -17,14 +17,14 @@ import dj_database_url
 
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
-SECRET_KEY = os.getenv('PASS_WORD')
 EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
+
 DB_NAME = os.environ.get('DB_NAME')
 DB_USER = os.environ.get('DB_USER')
 DB_PASSWORD = os.environ.get('DB_PASSWORD')
 DB_HOST = os.environ.get('DB_HOST')
-
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # OR, the same with increased verbosity
 # load_dotenv(verbose=True)
@@ -43,11 +43,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = SECRET_KEY
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False #включение режима дебага
 
-ALLOWED_HOSTS = ["*"] #настройка для размещения проекта на сервер
+ALLOWED_HOSTS = ["serv-jobfind.herokuapp.com"] #настройка для размещения проекта на сервер
 
 
 # Application definition
