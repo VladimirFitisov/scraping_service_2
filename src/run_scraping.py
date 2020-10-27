@@ -15,7 +15,7 @@ import django
 django.setup()
 
 from scraping.parsers import *
-from scraping.models import Vacancy, City, Language, Error, Url
+from scraping.models import Vacancy, Error, Url
 
 User = get_user_model()  # Возвращает пользователя поумолчанию  который определен в настройка проекта (в админке)
 
@@ -32,8 +32,7 @@ jobs, errors = [], []
 # настройки user по умолчанию из админки
 def get_settings():
     qs = User.objects.filter(send_email=True).values()
-    settings_lst = set((q['city_id'], q['language_id']) for q in
-                       qs)  # генератор множества, будут находится настройки по умолчанию для нашего набора
+    settings_lst = set((q['city_id'], q['language_id']) for q in qs)  # генератор множества, будут находится настройки по умолчанию для нашего набора
     return settings_lst
 
 
@@ -47,8 +46,10 @@ def get_urls(_settings):
             tmp = {}
             tmp['city'] = pair[0]
             tmp['language'] = pair[1]
-            tmp['url_data'] = url_dict[pair]
-            urls.append(tmp)
+            url_data = url_dict.get(pair)
+            if url_data:
+                tmp['url_data'] = url_dict.get(pair)
+                urls.append(tmp)
     return urls
 
 
@@ -63,18 +64,17 @@ async def main(value):
 settings = get_settings()
 url_list = get_urls(settings)
 
-# city = City.objects.filter(slug='kiev').first()
-# language = Language.objects.filter(slug='python').first()
-
-import time
-
-start = time.time()
 loop = asyncio.get_event_loop()
 tmp_tasks = [(func, data['url_data'][key], data['city'], data['language'])
              for data in url_list
              for func, key in parsers
              ]
-tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks])
+if tmp_tasks:
+    tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks])
+    loop.run_until_complete(tasks)
+    loop.close()
+
+
 # Запуск функции скрапинга с наборами url для всех которые существуют
 # for data in url_list:
 #     for func, key in parsers:
@@ -83,10 +83,6 @@ tasks = asyncio.wait([loop.create_task(main(f)) for f in tmp_tasks])
 #         jobs += j
 #         errors += e
 
-loop.run_until_complete(tasks)
-loop.close()
-
-print(time.time() - start)
 for job in jobs:
     v = Vacancy(**job)
     try:

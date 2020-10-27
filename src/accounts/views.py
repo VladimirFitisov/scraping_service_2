@@ -95,7 +95,7 @@ def contact(request):
             language = data.get('language')
             email = data.get('email')
             qs = Error.objects.filter(timestamp=dt.date.today())  # получение записи из бд, есть ли ошибки
-            if qs.exist():
+            if qs.exists():
                 err = qs.first()
                 data = err.data.get('user_data', [])
                 data.append({'city': city, 'language': language, 'email': email})
