@@ -1,0 +1,41 @@
+[
+{
+  "model": "scraping.city",
+  "pk": 1,
+  "fields": {
+    "name": "Киев",
+    "slug": "kiev"
+  }
+},
+{
+  "model": "scraping.city",
+  "pk": 2,
+  "fields": {
+    "name": "Одесса",
+    "slug": "odessа"
+  }
+},
+{
+  "model": "scraping.language",
+  "pk": 1,
+  "fields": {
+    "name": "Python",
+    "slug": "python"
+  }
+},
+{
+  "model": "scraping.language",
+  "pk": 2,
+  "fields": {
+    "name": "Java",
+    "slug": "java"
+  }
+},
+{
+  "model": "scraping.vacancy",
+  "pk": 1,
+  "fields": {
+    "url": "https://www.work.ua/jobs/3077144/",
+    "title": "Python developer",
+    "company": "Лиакон Конекшин, ООО",
+    "description": 
