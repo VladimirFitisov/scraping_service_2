@@ -42,7 +42,7 @@ class Language(models.Model):
 
 
 class Vacancy(models.Model):
-    url = models.URLField(unique=True)# url
+    url = models.URLField(unique=True)  # url
     title = models.CharField(max_length=250, verbose_name='Заголовок вакансии')
     company = models.CharField(max_length=250, verbose_name='Компания')
     description = models.TextField(verbose_name='Описание вакансии')
@@ -53,7 +53,7 @@ class Vacancy(models.Model):
     class Meta:
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
-        ordering = ['-timestamp'] #вывод вакансий в обратном порядке
+        ordering = ['-timestamp']  # вывод вакансий в обратном порядке
 
     def __str__(self):
         return self.title
@@ -66,6 +66,7 @@ class Error(models.Model):
     def __str__(self):
         return str(self.timestamp)
 
+
 # Хранение адресов пар язык программирования - город
 class Url(models.Model):
     city = models.ForeignKey('City', on_delete=models.CASCADE, verbose_name='Город')
@@ -73,6 +74,4 @@ class Url(models.Model):
     url_data = jsonfield.JSONField(default=default_urls)
 
     class Meta:
-        unique_together = ("city", "language") # указываем что унас уникальные параметры
-
-
+        unique_together = ("city", "language")  # указываем что унас уникальные параметры
