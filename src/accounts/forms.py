@@ -41,7 +41,7 @@ class UserRegistrationform(forms.ModelForm):
     password = forms.CharField(label='Введите пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label='Повторите пароль', widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
-    class Meta():
+    class Meta:
         model = User  # создаем форму на основе модели User
         fields = ('email',)
 
@@ -67,7 +67,7 @@ class UserUpdateForm(forms.Form):
     send_email = forms.BooleanField(required=False, widget=forms.CheckboxInput,
                                     label='Получать рассылку?')
 
-    class Meta():
+    class Meta:
         model = User  # создаем форму на основе модели User
         fields = ('email', 'language', 'send_email')
 

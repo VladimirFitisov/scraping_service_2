@@ -9,16 +9,19 @@ import datetime
 from django.contrib.auth import get_user_model
 from django.core.mail import EmailMultiAlternatives
 
-from scraping_service.settings import EMAIL_HOST_USER
-
-ADMIN_USER = EMAIL_HOST_USER
-
 proj = os.path.dirname(os.path.abspath('manage.py'))
 sys.path.append(proj)
 os.environ["DJANGO_SETTINGS_MODULE"] = "scraping_service.settings"
 
 django.setup()
 from scraping.models import Vacancy, Error, Url
+from scraping_service.settings import (
+    EMAIL_HOST_USER,
+    EMAIL_HOST, EMAIL_HOST_PASSWORD
+)
+
+ADMIN_USER = EMAIL_HOST_USER
+
 
 today = datetime.date.today()
 subject = f"Рассылка вакансий {today}"
@@ -95,3 +98,22 @@ if subject:
     msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
     msg.attach_alternative(_html, "text/html")
     msg.send()
+
+# import smtplib
+# from email.mime.multipart import MIMEMultipart
+# from email.mime.text import MIMEText
+#
+# msg = MIMEMultipart('alternative')
+# msg['Subject'] = 'Список вакансий за  {}'.format(today)
+# msg['From'] = EMAIL_HOST_USER
+# mail = smtplib.SMTP()
+# mail.connect(EMAIL_HOST, 25)
+# mail.ehlo()
+# mail.starttls()
+# mail.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+#
+# html_m = "<h1>Hello world</h1>"
+# part = MIMEText(html_m, 'html')
+# msg.attach(part)
+# mail.sendmail(EMAIL_HOST_USER, [to], msg.as_string())
+# mail.quit()

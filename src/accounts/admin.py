@@ -1,4 +1,3 @@
-from django.contrib import admin
 from django import forms
 from django.contrib import admin
 from django.contrib.auth.models import Group
@@ -66,7 +65,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ('is_admin',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
-        ('Settings', {'fields': ('language', 'city', 'send_email')}),
+        ('Vacancy', {'fields': ('language', 'city', 'send_email')}),
         ('Permissions', {'fields': ('is_admin',)}),
     )
     # add_fieldsets is not a standard ModelAdmin attribute. UserAdmin
